@@ -6,6 +6,8 @@ metadata:
   labels:
     app: grafana
 spec:
+  type: LoadBalancer
+  loadBalancerIP: 52.139.236.175
   selector:
     app: grafana
   ports:
@@ -13,4 +15,3 @@ spec:
       protocol: TCP
       port: 3000
       targetPort: 3000
-  type: LoadBalancer
