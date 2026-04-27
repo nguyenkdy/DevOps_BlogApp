@@ -27,21 +27,3 @@ data:
           - source_labels: [__meta_kubernetes_service_name]
             action: keep
             regex: node-exporter
-          - source_labels: [__meta_kubernetes_endpoint_port_name]
-            action: keep
-            regex: metrics
-
-      # Enable the jobs below after exposing /actuator/prometheus
-      # and including "prometheus" in management endpoints.
-      #
-      # - job_name: api-gateway
-      #   metrics_path: /actuator/prometheus
-      #   static_configs:
-      #     - targets:
-      #         - api-gateway.production.svc.cluster.local:8080
-      #
-      # - job_name: auth-service
-      #   metrics_path: /actuator/prometheus
-      #   static_configs:
-      #     - targets:
-      #         - auth-service.production.svc.cluster.local:9001
