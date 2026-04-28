@@ -25,7 +25,7 @@ spec:
               until nc -z user-db 5432; do echo waiting for user-db; sleep 2; done
       containers:
         - name: user-service
-          image: khanhduy05/user-service:39
+          image: khanhduy05/user-service:46
           imagePullPolicy: Always
           ports:
             - containerPort: 9002
