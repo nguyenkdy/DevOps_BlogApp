@@ -25,7 +25,7 @@ spec:
               until nc -z comment-db 5432; do echo waiting for comment-db; sleep 2; done
       containers:
         - name: comment-service
-          image: khanhduy05/comment-service:36
+          image: khanhduy05/comment-service:43
           imagePullPolicy: Always
           ports:
             - containerPort: 9004
