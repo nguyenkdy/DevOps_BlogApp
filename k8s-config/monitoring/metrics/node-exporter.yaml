@@ -6,6 +6,22 @@ metadata:
   labels:
     app: node-exporter
 spec:
+  selector:
+    app: node-exporter
+  ports:
+    - name: metrics
+      port: 9100
+      targetPort: 9100
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-exporter-headless
+  namespace: monitoring
+  labels:
+    app: node-exporter
+spec:
   clusterIP: None
   publishNotReadyAddresses: true
   selector:
@@ -14,7 +30,6 @@ spec:
     - name: metrics
       port: 9100
       targetPort: 9100
-  type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: DaemonSet

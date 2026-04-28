@@ -20,7 +20,7 @@ data:
       - job_name: node-exporter
         dns_sd_configs:
           - names:
-              - node-exporter.monitoring.svc.cluster.local
+              - node-exporter-headless.monitoring.svc.cluster.local
             type: A
             port: 9100
         relabel_configs:
