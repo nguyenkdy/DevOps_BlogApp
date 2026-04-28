@@ -6,6 +6,8 @@ metadata:
   labels:
     app: node-exporter
 spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
   selector:
     app: node-exporter
   ports:

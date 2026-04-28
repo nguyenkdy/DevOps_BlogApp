@@ -18,21 +18,13 @@ data:
               - localhost:9090
 
       - job_name: node-exporter
-        kubernetes_sd_configs:
-          - role: endpoints
-            namespaces:
-              names:
-                - monitoring
+        dns_sd_configs:
+          - names:
+              - node-exporter.monitoring.svc.cluster.local
+            type: A
+            port: 9100
         relabel_configs:
-          - source_labels: [__meta_kubernetes_service_name]
-            action: keep
-            regex: node-exporter
-
-          - source_labels: [__meta_kubernetes_endpoint_port_name]
-            action: keep
-            regex: metrics
-
-          - source_labels: [__meta_kubernetes_pod_node_name]
+          - source_labels: [__address__]
             target_label: instance
 
       - job_name: api-gateway
