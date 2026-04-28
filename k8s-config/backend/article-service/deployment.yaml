@@ -25,7 +25,7 @@ spec:
               until nc -z article-db 5432; do echo waiting for article-db; sleep 2; done
       containers:
         - name: article-service
-          image: khanhduy05/article-service:41
+          image: khanhduy05/article-service:46
           imagePullPolicy: Always
           ports:
             - containerPort: 9003
