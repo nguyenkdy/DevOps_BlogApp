@@ -16,7 +16,7 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                echo '========== Checkout Code =============='
+                echo '========== Checkout Code ====================='
                 git branch: "${BRANCH_NAME}", url: "${GITHUB_REPO}"
                 sh 'chmod +x gradlew'
             }
