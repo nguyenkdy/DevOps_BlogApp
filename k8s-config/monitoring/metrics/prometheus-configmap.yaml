@@ -18,7 +18,58 @@ data:
                 - 'alertmanager:9093'
 
     rule_files:
-      # - "alert-rules.yml" # Hiện tại comment lại, sau này bạn tạo file rules thì bỏ dấu # đi
+      alert-rules.yml: |
+    groups:
+    # ==========================================
+    # NHÓM 1: CẢNH BÁO TÀI NGUYÊN NODE (AKS)
+    # ==========================================
+    - name: NodeAlerts
+      rules:
+      # 1. Cảnh báo CPU Node > 80% trong 5 phút
+      - alert: NodeCPUUsageHigh
+        expr: (1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance)) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Cảnh báo: CPU của Node {{ $labels.instance }} quá cao!"
+          description: "CPU đang hoạt động ở mức {{ $value | printf \"%.2f\" }}% trong hơn 5 phút qua."
+
+      # 2. Cảnh báo RAM Node > 80% trong 5 phút
+      - alert: NodeMemoryUsageHigh
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Cảnh báo: RAM của Node {{ $labels.instance }} sắp hết!"
+          description: "RAM đang sử dụng {{ $value | printf \"%.2f\" }}% công suất trong 5 phút qua."
+
+    # ==========================================
+    # NHÓM 2: CẢNH BÁO MICROSERVICES (APP LEVEL)
+    # ==========================================
+    - name: MicroservicesAlerts
+      rules:
+
+      # 4. Cảnh báo Traffic tăng đột biến (> 100 requests/giây)
+      - alert: HighHttpTraffic
+        expr: sum(rate(http_server_requests_seconds_count[2m])) by (job, instance) > 100
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Cảnh báo: Lượng truy cập vào {{ $labels.job }} tăng đột biến!"
+          description: "Service {{ $labels.job }} ({{ $labels.instance }}) đang nhận {{ $value | printf \"%.0f\" }} requests/giây. Hãy kiểm tra xem có bị DDoS hay không."
+
+      # 5. Cảnh báo Độ trễ (Latency) trung bình > 0.5 giây (500ms)
+      - alert: HighLatency
+        expr: sum(rate(http_server_requests_seconds_sum[3m])) by (job, instance) / sum(rate(http_server_requests_seconds_count[3m])) by (job, instance) > 0.5
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Cảnh báo: Service {{ $labels.job }} phản hồi quá chậm!"
+          description: "Thời gian phản hồi trung bình của {{ $labels.job }} ({{ $labels.instance }}) đang là {{ $value | printf \"%.2f\" }} giây."
 
     scrape_configs:
       - job_name: prometheus
