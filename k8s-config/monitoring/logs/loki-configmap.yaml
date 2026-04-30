@@ -11,11 +11,6 @@ data:
       http_listen_port: 3100
 
     common:
-      path: /loki
-      storage:
-        filesystem:
-          chunks_directory: /loki/chunks
-          rules_directory: /loki/rules
       replication_factor: 1
       ring:
         instance_addr: 127.0.0.1
@@ -36,10 +31,15 @@ data:
       boltdb_shipper:
         active_index_directory: /loki/index
         cache_location: /loki/cache
+        shared_store: filesystem
+
       filesystem:
         directory: /loki/chunks
 
     limits_config:
-      allow_structured_metadata: false
       reject_old_samples: true
       reject_old_samples_max_age: 168h
+
+    compactor:
+      working_directory: /loki/compactor
+      shared_store: filesystem
