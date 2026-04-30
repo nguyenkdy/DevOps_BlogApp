@@ -17,11 +17,29 @@ data:
 
     scrape_configs:
       - job_name: kubernetes-pods
-        pipeline_stages:
-          - cri: {}
-
         kubernetes_sd_configs:
           - role: pod
+
+        pipeline_stages:
+          # Parse log chuẩn Kubernetes container log
+          - cri: {}
+
+          # Gom log nhiều dòng, ví dụ Java Exception stacktrace
+          - multiline:
+              firstline: '^\d{4}-\d{2}-\d{2}.*\s(ERROR|WARN|INFO|DEBUG|TRACE)\s'
+              max_wait_time: 3s
+
+          # Tách trạng thái log: ERROR, WARN, INFO,...
+          - regex:
+              expression: '^(?P<time>\d{4}-\d{2}-\d{2}.*?)\s+(?P<level>ERROR|WARN|INFO|DEBUG|TRACE)\s+(?P<message>.*)'
+
+          # Đưa level thành label để query trong Grafana
+          - labels:
+              level:
+
+          # Nội dung log hiển thị chính là message
+          - output:
+              source: message
 
         relabel_configs:
           - source_labels: [__meta_kubernetes_namespace]
