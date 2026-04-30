@@ -21,23 +21,20 @@ data:
           - role: pod
 
         pipeline_stages:
-          # Parse log chuẩn Kubernetes container log
           - cri: {}
 
-          # Gom log nhiều dòng, ví dụ Java Exception stacktrace
           - multiline:
-              firstline: '^\d{4}-\d{2}-\d{2}.*\s(ERROR|WARN|INFO|DEBUG|TRACE)\s'
+              firstline: '^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}'
               max_wait_time: 3s
 
-          # Tách trạng thái log: ERROR, WARN, INFO,...
           - regex:
-              expression: '^(?P<time>\d{4}-\d{2}-\d{2}.*?)\s+(?P<level>ERROR|WARN|INFO|DEBUG|TRACE)\s+(?P<message>.*)'
+              expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}.*?)\s+(?P<level>ERROR|WARN|INFO|DEBUG|TRACE)\s+(?P<pid>\d+)\s+---\s+\[(?P<thread>.*?)\]\s+(?P<logger>[a-zA-Z0-9_.]+)\s*:\s+(?P<message>.*)'
 
-          # Đưa level thành label để query trong Grafana
           - labels:
               level:
+              logger:
+              thread:
 
-          # Nội dung log hiển thị chính là message
           - output:
               source: message
 
