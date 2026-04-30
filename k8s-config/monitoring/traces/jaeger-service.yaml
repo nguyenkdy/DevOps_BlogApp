@@ -6,7 +6,8 @@ metadata:
   labels:
     app: jaeger
 spec:
-  type: ClusterIP
+  type: LoadBalancer
+  loadBalancerIP: 52.139.236.175
   selector:
     app: jaeger
   ports:
