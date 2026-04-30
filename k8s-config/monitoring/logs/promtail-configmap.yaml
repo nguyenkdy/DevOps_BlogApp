@@ -3,8 +3,6 @@ kind: ConfigMap
 metadata:
   name: promtail-config
   namespace: monitoring
-  labels:
-    app: promtail
 data:
   promtail-config.yaml: |
     server:
@@ -18,28 +16,30 @@ data:
       - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
 
     scrape_configs:
+
+      # 🔥 POD LOGS (QUAN TRỌNG NHẤT)
       - job_name: kubernetes-pods
         kubernetes_sd_configs:
           - role: pod
+
         pipeline_stages:
           - cri: {}
+
         relabel_configs:
-          - action: replace
-            source_labels:
-              - __meta_kubernetes_namespace
+
+          - source_labels: [__meta_kubernetes_namespace]
             target_label: namespace
-          - action: replace
-            source_labels:
-              - __meta_kubernetes_pod_name
+
+          - source_labels: [__meta_kubernetes_pod_name]
             target_label: pod
-          - action: replace
-            source_labels:
-              - __meta_kubernetes_pod_container_name
+
+          - source_labels: [__meta_kubernetes_pod_container_name]
             target_label: container
-          - action: replace
-            source_labels:
-              - __meta_kubernetes_pod_node_name
+
+          - source_labels: [__meta_kubernetes_pod_node_name]
             target_label: node
+
+          # 🔥 Service label
           - action: replace
             separator: ;
             source_labels:
@@ -50,20 +50,22 @@ data:
             regex: ^;*([^;]+).*
             replacement: $1
             target_label: service
-          - action: replace
-            source_labels:
-              - namespace
-              - service
+
+          - source_labels: [namespace, service]
             separator: /
             target_label: job
+
+          # 🔥 PATH FIX QUAN TRỌNG
           - action: replace
-            separator: /
             source_labels:
               - __meta_kubernetes_pod_uid
               - __meta_kubernetes_pod_container_name
-            replacement: /var/log/pods/*$1/*.log
+            separator: /
+            replacement: /var/log/pods/*$1/$2/*.log
             target_label: __path__
 
+
+      # 🔥 NODE LOGS
       - job_name: node-logs
         static_configs:
           - targets:
@@ -73,24 +75,3 @@ data:
               service: node
               node: ${NODE_NAME}
               __path__: /var/log/*.log
-          - targets:
-              - localhost
-            labels:
-              job: node-logs
-              service: node
-              node: ${NODE_NAME}
-              __path__: /var/log/syslog
-          - targets:
-              - localhost
-            labels:
-              job: node-logs
-              service: node
-              node: ${NODE_NAME}
-              __path__: /var/log/messages
-          - targets:
-              - localhost
-            labels:
-              job: node-logs
-              service: node
-              node: ${NODE_NAME}
-              __path__: /var/log/dmesg
