@@ -13,6 +13,7 @@ rules:
     resources:
       - pods
       - nodes
+      - nodes/proxy
       - services
       - endpoints
       - namespaces
