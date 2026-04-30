@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager
+  namespace: monitoring # Khai báo rõ namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alertmanager
+  template:
+    metadata:
+      labels:
+        app: alertmanager
+    spec:
+      containers:
+      - name: alertmanager
+        image: prom/alertmanager:v0.27.0
+        ports:
+        - containerPort: 9093
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/alertmanager
+        # Mount Secret chứa mật khẩu Gmail vào Pod
+        - name: smtp-secret-volume
+          mountPath: /etc/secrets/smtp-password
+          readOnly: true
+      volumes:
+      - name: config-volume
+        configMap:
+          name: alertmanager-config
+      # Khai báo volume lấy từ Kubernetes Secret đã tạo trên cluster
+      - name: smtp-secret-volume
+        secret:
+          secretName: alertmanager-smtp

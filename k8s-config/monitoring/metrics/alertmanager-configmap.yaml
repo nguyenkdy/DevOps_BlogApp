@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: monitoring # Đã đổi thành monitoring
+data:
+  alertmanager.yml: |
+    global:
+      smtp_smarthost: 'smtp.gmail.com:587'
+      smtp_from: 'nguyenkhanhduy20050616@gmail.com'
+      smtp_auth_username: 'nguyenkhanhduy20050616@gmail.com'
+      # Sử dụng file được mount từ K8s Secret thay vì viết plaintext
+      smtp_auth_password_file: '/etc/secrets/smtp-password/password'
+      smtp_require_tls: true
+
+    route:
+      group_by: ['alertname']
+      group_wait: 10s
+      group_interval: 5m
+      repeat_interval: 1h
+      receiver: 'email-notifications'
+
+    receivers:
+    - name: 'email-notifications'
+      email_configs:
+      - to: 'nguyenkhanhduy20050616@gmail.com'
+        send_resolved: true
