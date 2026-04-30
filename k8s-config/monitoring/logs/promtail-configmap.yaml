@@ -4,7 +4,7 @@ metadata:
   name: promtail-config
   namespace: monitoring
 data:
-  promtail-config.yaml: |
+  promtail.yaml: |
     server:
       http_listen_port: 9080
       grpc_listen_port: 0
@@ -13,112 +13,74 @@ data:
       filename: /run/promtail/positions.yaml
 
     clients:
-      - url: http://loki.monitoring.svc.cluster.local:3100/loki/api/v1/push
+      - url: http://loki:3100/loki/api/v1/push
 
     scrape_configs:
-
-      # 🔥 POD LOGS - Kubernetes Service Discovery
+      # =========================
+      # POD LOGS
+      # =========================
       - job_name: kubernetes-pods
+        pipeline_stages:
+          - cri: {}
+
         kubernetes_sd_configs:
           - role: pod
 
-        pipeline_stages:
-          # Parse CRI logs format
-          - cri: {}
-          
-          # Multi-line logs support
-          - multiline:
-              line_start_pattern: '^\d{4}-\d{2}-\d{2}|\[.*\]'
-
-          # Parse JSON logs if present
-          - json:
-              expressions:
-                message: message
-                level: level
-                timestamp: timestamp
-              action: try
-
         relabel_configs:
-          # Drop kube-system and kube-public logs (optional)
-          - source_labels: [__meta_kubernetes_namespace]
-            regex: 'kube-(system|public|node)'
-            action: drop
-
-          # Namespace label
-          - source_labels: [__meta_kubernetes_namespace]
-            action: replace
+          - source_labels:
+              - __meta_kubernetes_namespace
             target_label: namespace
 
-          # Pod name label
-          - source_labels: [__meta_kubernetes_pod_name]
-            action: replace
+          - source_labels:
+              - __meta_kubernetes_pod_name
             target_label: pod
 
-          # Container name label
-          - source_labels: [__meta_kubernetes_pod_container_name]
-            action: replace
+          - source_labels:
+              - __meta_kubernetes_pod_container_name
             target_label: container
 
-          # Node name label
-          - source_labels: [__meta_kubernetes_pod_node_name]
-            action: replace
+          - source_labels:
+              - __meta_kubernetes_pod_label_app
+            target_label: app
+
+          - source_labels:
+              - __meta_kubernetes_pod_node_name
             target_label: node
 
-          # Service/App label
-          - action: replace
-            separator: ;
-            source_labels:
-              - __meta_kubernetes_pod_label_app
-              - __meta_kubernetes_pod_label_app_kubernetes_io_name
-              - __meta_kubernetes_pod_controller_name
-              - __meta_kubernetes_pod_name
-            regex: ^;*([^;]+).*
-            replacement: $1
-            target_label: service
-
-          # Job label = namespace/service
-          - source_labels: [namespace, service]
-            separator: /
-            target_label: job
-
-          # 🔥 LOG PATH CONFIGURATION - Most important!
-          # Kubernetes stores pod logs in: /var/log/pods/{namespace}_{pod_name}_{pod_uid}/{container_name}/{container_id}.log
           - action: replace
             source_labels:
               - __meta_kubernetes_pod_uid
               - __meta_kubernetes_pod_container_name
             separator: /
-            replacement: /var/log/pods/*$1/$2/*.log
+            replacement: /var/log/pods/*$1/*.log
             target_label: __path__
 
-      # Kubelet logs
-      - job_name: kubernetes-kubelet
-        scheme: https
-        tls_config:
-          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-        kubernetes_sd_configs:
-          - role: node
-
-        relabel_configs:
-          - action: labelmap
-            regex: __meta_kubernetes_node_label_(.+)
-          
-          - target_label: __address__
-            replacement: kubernetes.default.svc:443
-          
-          - source_labels: [__meta_kubernetes_node_name]
-            regex: (.+)
-            replacement: /api/v1/nodes/${1}/proxy/logs/kubelet.log
-            target_label: __path__
-
-      # Node logs
+      # =========================
+      # NODE SYSTEM LOGS
+      # =========================
       - job_name: node-logs
         static_configs:
           - targets:
               - localhost
             labels:
               job: node-logs
-              service: node
-              node: ${NODE_NAME}
-              __path__: /var/log/syslog,/var/log/messages,/var/log/audit/audit.log
+              log_type: node
+              __path__: /var/log/syslog
+
+      - job_name: node-kern-logs
+        static_configs:
+          - targets:
+              - localhost
+            labels:
+              job: node-kern-logs
+              log_type: kernel
+              __path__: /var/log/kern.log
+
+      - job_name: node-auth-logs
+        static_configs:
+          - targets:
+              - localhost
+            labels:
+              job: node-auth-logs
+              log_type: auth
+              __path__: /var/log/auth.log

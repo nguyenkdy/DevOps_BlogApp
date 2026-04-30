@@ -3,46 +3,24 @@ kind: DaemonSet
 metadata:
   name: promtail
   namespace: monitoring
-  labels:
-    app: promtail
 spec:
   selector:
     matchLabels:
       app: promtail
+
   template:
     metadata:
       labels:
         app: promtail
+
     spec:
       serviceAccountName: promtail
-      tolerations:
-        - operator: Exists
 
       containers:
         - name: promtail
-          image: grafana/promtail:2.9.8
+          image: grafana/promtail:2.9.3
           args:
-            - -config.file=/etc/promtail/promtail-config.yaml
-            - -config.expand-env=true
-
-          env:
-            - name: NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-            - name: HOSTNAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-            - name: CONTAINER_RUNTIME
-              value: "containerd"
-
-          ports:
-            - containerPort: 9080
-              name: http-metrics
-
-          securityContext:
-            runAsUser: 0
+            - -config.file=/etc/promtail/promtail.yaml
 
           volumeMounts:
             - name: config
@@ -51,19 +29,17 @@ spec:
             - name: run
               mountPath: /run/promtail
 
-            # 🔥 CRITICAL (node logs)
             - name: varlog
               mountPath: /var/log
               readOnly: true
 
-            # 🔥 CRITICAL (pod logs)
-            - name: pods
-              mountPath: /var/log/pods
-              readOnly: true
-
-            - name: containers
-              mountPath: /var/log/containers
-              readOnly: true
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "256Mi"
 
       volumes:
         - name: config
@@ -76,11 +52,3 @@ spec:
         - name: varlog
           hostPath:
             path: /var/log
-
-        - name: pods
-          hostPath:
-            path: /var/log/pods
-
-        - name: containers
-          hostPath:
-            path: /var/log/containers
