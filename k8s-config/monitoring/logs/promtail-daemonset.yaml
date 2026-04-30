@@ -3,6 +3,8 @@ kind: DaemonSet
 metadata:
   name: promtail
   namespace: monitoring
+  labels:
+    app: promtail
 spec:
   selector:
     matchLabels:
@@ -13,25 +15,55 @@ spec:
         app: promtail
     spec:
       serviceAccountName: promtail
+
+      tolerations:
+        - operator: Exists
+
       containers:
         - name: promtail
           image: grafana/promtail:2.9.3
+          imagePullPolicy: IfNotPresent
+
           args:
             - -config.file=/etc/promtail/promtail.yaml
+
+          env:
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+
+          ports:
+            - name: http-metrics
+              containerPort: 9080
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+
           volumeMounts:
             - name: config
               mountPath: /etc/promtail
+
             - name: run
               mountPath: /run/promtail
+
             - name: varlog
               mountPath: /var/log
               readOnly: true
+
       volumes:
         - name: config
           configMap:
             name: promtail-config
+
         - name: run
           emptyDir: {}
+
         - name: varlog
           hostPath:
             path: /var/log
