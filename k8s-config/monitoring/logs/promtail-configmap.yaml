@@ -17,7 +17,7 @@ data:
 
     scrape_configs:
       # =========================
-      # POD LOGS
+      # POD / SERVICE LOGS
       # =========================
       - job_name: kubernetes-pods
         pipeline_stages:
@@ -52,7 +52,8 @@ data:
               - __meta_kubernetes_pod_uid
               - __meta_kubernetes_pod_container_name
             separator: /
-            replacement: /var/log/pods/*$1/*.log
+            regex: (.*)/(.*)
+            replacement: /var/log/pods/*$1/$2/*.log
             target_label: __path__
 
       # =========================
