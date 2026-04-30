@@ -33,6 +33,11 @@ spec:
               mountPath: /var/log
               readOnly: true
 
+            # ✅ FIX: Mount riêng /var/log/pods để đọc container logs (containerd/CRI-O)
+            - name: pods
+              mountPath: /var/log/pods
+              readOnly: true
+
           resources:
             requests:
               cpu: "100m"
@@ -52,3 +57,8 @@ spec:
         - name: varlog
           hostPath:
             path: /var/log
+
+        # ✅ FIX: Volume cho /var/log/pods
+        - name: pods
+          hostPath:
+            path: /var/log/pods
