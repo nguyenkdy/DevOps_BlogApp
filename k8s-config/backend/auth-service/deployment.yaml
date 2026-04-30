@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: khanhduy05/auth-service:50
+          image: khanhduy05/auth-service:51
           imagePullPolicy: Always
           ports:
             - containerPort: 9001
@@ -38,6 +38,22 @@ spec:
               value: "true"
             - name: EUREKA_CLIENT_ENABLED
               value: "true"
+            
+            # --- CẤU HÌNH OPENTELEMETRY (MỚI) ---
+            - name: OTEL_SERVICE_NAME
+              value: "auth-service"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector.monitoring.svc.cluster.local:4317" # Lưu ý: auth-service ở namespace 'production' sẽ trỏ xuyên qua namespace 'monitoring'
+            - name: OTEL_TRACES_EXPORTER
+              value: "otlp"
+            - name: OTEL_METRICS_EXPORTER
+              value: "none"
+            - name: OTEL_LOGS_EXPORTER
+              value: "none"
+            - name: OTEL_TRACES_SAMPLER
+              value: "traceidratio"
+            - name: OTEL_TRACES_SAMPLER_ARG
+              value: "0.1"
           resources:
             requests:
               cpu: "100m"
