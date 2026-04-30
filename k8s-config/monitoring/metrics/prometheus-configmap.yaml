@@ -12,7 +12,7 @@ data:
     - name: NodeAlerts
       rules:
       - alert: NodeCPUUsageHigh
-        expr: (1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance)) * 100 > 20
+        expr: (1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance)) * 100 > 80
         for: 2m
         labels:
           severity: warning
@@ -21,7 +21,7 @@ data:
           description: "CPU đang hoạt động ở mức {{ $value | printf \"%.2f\" }}% trong hơn 2 phút qua."
 
       - alert: NodeMemoryUsageHigh
-        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 20
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 80
         for: 2m
         labels:
           severity: warning
@@ -31,6 +31,14 @@ data:
 
     - name: MicroservicesAlerts
       rules:
+      - alert: ImmediateErrorRate
+        expr: sum(rate(http_server_requests_seconds_count{status=~"5.."}[1m])) by (job, instance) > 0
+        for: 0s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Cảnh báo: Service {{ $labels.job }} phát sinh lỗi 5xx!"
+          description: "Phát hiện có lỗi server (5xx) tại {{ $labels.instance }}. Tần suất hiện tại: {{ $value | printf \"%.2f\" }} lỗi/giây."
       - alert: HighHttpTraffic
         expr: sum(rate(http_server_requests_seconds_count[2m])) by (job, instance) > 100
         for: 2m
