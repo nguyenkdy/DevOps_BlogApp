@@ -53,7 +53,7 @@ spec:
             - name: OTEL_TRACES_SAMPLER
               value: "traceidratio"
             - name: OTEL_TRACES_SAMPLER_ARG
-              value: "0.1"
+              value: "1.0"
           resources:
             requests:
               cpu: "100m"
