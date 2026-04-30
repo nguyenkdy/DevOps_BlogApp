@@ -2,16 +2,20 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: alertmanager-config
-  namespace: monitoring # Đã đổi thành monitoring
+  namespace: monitoring
 data:
+  # --- FILE 1: Cấu hình chính ---
   alertmanager.yml: |
     global:
       smtp_smarthost: 'smtp.gmail.com:587'
       smtp_from: 'nguyenkhanhduy20050616@gmail.com'
       smtp_auth_username: 'nguyenkhanhduy20050616@gmail.com'
-      # Sử dụng file được mount từ K8s Secret thay vì viết plaintext
       smtp_auth_password_file: '/etc/secrets/smtp-password/password'
       smtp_require_tls: true
+
+    # Khai báo sử dụng file template bên dưới
+    templates:
+    - '/etc/alertmanager/email.tmpl'
 
     route:
       group_by: ['alertname']
@@ -25,3 +29,50 @@ data:
       email_configs:
       - to: 'nguyenkhanhduy20050616@gmail.com'
         send_resolved: true
+        # Chỉ định sử dụng template "custom_email_html" định nghĩa ở file bên dưới
+        html: '{{ template "custom_email_html" . }}'
+        headers:
+          Subject: '[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }}'
+
+  # --- FILE 2: File Template HTML/CSS tùy chỉnh ---
+  email.tmpl: |
+    {{ define "custom_email_html" }}
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
+            .header { padding: 20px; color: white; text-align: center; font-weight: bold; font-size: 20px; }
+            .firing { background-color: #d9534f; }
+            .resolved { background-color: #5cb85c; }
+            .content { padding: 20px; background-color: #ffffff; }
+            .alert-item { margin-bottom: 15px; padding: 15px; border-left: 5px solid #eee; background-color: #f9f9f9; }
+            .label { font-weight: bold; color: #555; }
+            .footer { padding: 10px; background-color: #f4f4f4; text-align: center; font-size: 12px; color: #999; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header {{ if eq .Status "firing" }}firing{{ else }}resolved{{ end }}">
+                {{ if eq .Status "firing" }}🔥 ALERT: {{ .CommonLabels.alertname }}{{ else }}✅ RESOLVED: {{ .CommonLabels.alertname }}{{ end }}
+            </div>
+            <div class="content">
+                <p>Hệ thống giám sát ghi nhận <b>{{ .Alerts | len }}</b> thông báo:</p>
+                {{ range .Alerts }}
+                <div class="alert-item">
+                    <div><span class="label">Trạng thái:</span> {{ .Status | toUpper }}</div>
+                    <div><span class="label">Mô tả:</span> {{ .Annotations.description }}</div>
+                    <div><span class="label">Chi tiết:</span> {{ .Annotations.summary }}</div>
+                    <div><span class="label">Node/Instance:</span> {{ .Labels.instance }}</div>
+                    <div><span class="label">Thời gian:</span> {{ .StartsAt.Format "15:04:05 02/01/2006" }}</div>
+                </div>
+                {{ end }}
+            </div>
+            <div class="footer">
+                Tự động gửi từ hệ thống Monitoring AKS của Nguyễn Khánh Duy
+            </div>
+        </div>
+    </body>
+    </html>
+    {{ end }}
