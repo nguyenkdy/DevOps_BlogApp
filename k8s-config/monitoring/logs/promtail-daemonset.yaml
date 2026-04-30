@@ -30,6 +30,12 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: CONTAINER_RUNTIME
+              value: "containerd"
 
           ports:
             - containerPort: 9080

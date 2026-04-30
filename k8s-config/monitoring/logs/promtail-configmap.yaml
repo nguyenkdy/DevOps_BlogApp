@@ -17,29 +17,54 @@ data:
 
     scrape_configs:
 
-      # 🔥 POD LOGS (QUAN TRỌNG NHẤT)
+      # 🔥 POD LOGS - Kubernetes Service Discovery
       - job_name: kubernetes-pods
         kubernetes_sd_configs:
           - role: pod
 
         pipeline_stages:
+          # Parse CRI logs format
           - cri: {}
+          
+          # Multi-line logs support
+          - multiline:
+              line_start_pattern: '^\d{4}-\d{2}-\d{2}|\[.*\]'
+
+          # Parse JSON logs if present
+          - json:
+              expressions:
+                message: message
+                level: level
+                timestamp: timestamp
+              action: try
 
         relabel_configs:
-
+          # Drop kube-system and kube-public logs (optional)
           - source_labels: [__meta_kubernetes_namespace]
+            regex: 'kube-(system|public|node)'
+            action: drop
+
+          # Namespace label
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
             target_label: namespace
 
+          # Pod name label
           - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
             target_label: pod
 
+          # Container name label
           - source_labels: [__meta_kubernetes_pod_container_name]
+            action: replace
             target_label: container
 
+          # Node name label
           - source_labels: [__meta_kubernetes_pod_node_name]
+            action: replace
             target_label: node
 
-          # 🔥 Service label
+          # Service/App label
           - action: replace
             separator: ;
             source_labels:
@@ -51,11 +76,13 @@ data:
             replacement: $1
             target_label: service
 
+          # Job label = namespace/service
           - source_labels: [namespace, service]
             separator: /
             target_label: job
 
-          # 🔥 PATH FIX QUAN TRỌNG
+          # 🔥 LOG PATH CONFIGURATION - Most important!
+          # Kubernetes stores pod logs in: /var/log/pods/{namespace}_{pod_name}_{pod_uid}/{container_name}/{container_id}.log
           - action: replace
             source_labels:
               - __meta_kubernetes_pod_uid
@@ -64,8 +91,28 @@ data:
             replacement: /var/log/pods/*$1/$2/*.log
             target_label: __path__
 
+      # Kubelet logs
+      - job_name: kubernetes-kubelet
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        kubernetes_sd_configs:
+          - role: node
 
-      # 🔥 NODE LOGS
+        relabel_configs:
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          
+          - source_labels: [__meta_kubernetes_node_name]
+            regex: (.+)
+            replacement: /api/v1/nodes/${1}/proxy/logs/kubelet.log
+            target_label: __path__
+
+      # Node logs
       - job_name: node-logs
         static_configs:
           - targets:
@@ -74,4 +121,4 @@ data:
               job: node-logs
               service: node
               node: ${NODE_NAME}
-              __path__: /var/log/*.log
+              __path__: /var/log/syslog,/var/log/messages,/var/log/audit/audit.log
