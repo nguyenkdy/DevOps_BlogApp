@@ -3,7 +3,6 @@ kind: ServiceAccount
 metadata:
   name: promtail
   namespace: monitoring
-
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -21,7 +20,6 @@ rules:
       - get
       - list
       - watch
-
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
