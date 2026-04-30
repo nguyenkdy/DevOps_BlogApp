@@ -25,12 +25,12 @@ data:
         endpoint: "jaeger.monitoring.svc.cluster.local:4317"
         tls:
           insecure: true
-      logging:
-        verbosity: detailed # In log ra console pod để bạn dễ debug
+      debug: 
+        verbosity: detailed 
 
     service:
       pipelines:
         traces:
           receivers: [otlp]
           processors: [batch]
-          exporters: [otlp/jaeger, logging]
+          exporters: [otlp/jaeger, debug] 
