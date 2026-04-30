@@ -12,22 +12,22 @@ data:
     - name: NodeAlerts
       rules:
       - alert: NodeCPUUsageHigh
-        expr: (1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance)) * 100 > 80
-        for: 5m
+        expr: (1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) by (instance)) * 100 > 20
+        for: 2m
         labels:
           severity: warning
         annotations:
           summary: "Cảnh báo: CPU của Node {{ $labels.instance }} quá cao!"
-          description: "CPU đang hoạt động ở mức {{ $value | printf \"%.2f\" }}% trong hơn 5 phút qua."
+          description: "CPU đang hoạt động ở mức {{ $value | printf \"%.2f\" }}% trong hơn 2 phút qua."
 
       - alert: NodeMemoryUsageHigh
-        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 80
-        for: 5m
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 20
+        for: 2m
         labels:
           severity: warning
         annotations:
           summary: "Cảnh báo: RAM của Node {{ $labels.instance }} sắp hết!"
-          description: "RAM đang sử dụng {{ $value | printf \"%.2f\" }}% công suất trong 5 phút qua."
+          description: "RAM đang sử dụng {{ $value | printf \"%.2f\" }}% công suất trong 2 phút qua."
 
     - name: MicroservicesAlerts
       rules:
