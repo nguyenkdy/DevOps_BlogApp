@@ -7,58 +7,32 @@ spec:
   selector:
     matchLabels:
       app: promtail
-
   template:
     metadata:
       labels:
         app: promtail
-
     spec:
       serviceAccountName: promtail
-
       containers:
         - name: promtail
           image: grafana/promtail:2.9.3
           args:
             - -config.file=/etc/promtail/promtail.yaml
-
           volumeMounts:
             - name: config
               mountPath: /etc/promtail
-
             - name: run
               mountPath: /run/promtail
-
             - name: varlog
               mountPath: /var/log
               readOnly: true
-
-            # ✅ FIX: Mount riêng /var/log/pods để đọc container logs (containerd/CRI-O)
-            - name: pods
-              mountPath: /var/log/pods
-              readOnly: true
-
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "128Mi"
-            limits:
-              cpu: "300m"
-              memory: "256Mi"
-
       volumes:
         - name: config
           configMap:
             name: promtail-config
-
         - name: run
           emptyDir: {}
-
         - name: varlog
           hostPath:
             path: /var/log
-
-        # ✅ FIX: Volume cho /var/log/pods
-        - name: pods
-          hostPath:
-            path: /var/log/pods
+            type: Directory
