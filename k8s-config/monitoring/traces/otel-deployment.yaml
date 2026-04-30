@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+  namespace: monitoring
+  labels:
+    app: opentelemetry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opentelemetry
+  template:
+    metadata:
+      labels:
+        app: opentelemetry
+    spec:
+      containers:
+      - name: otel-collector
+        # Dùng bản contrib để có đầy đủ receiver/exporter nhất
+        image: otel/opentelemetry-collector-contrib:latest 
+        command:
+        - "/otelcol-contrib"
+        - "--config=/etc/otelcol-contrib/otel-collector-config.yaml"
+        ports:
+        - containerPort: 4317 # Nhận gRPC từ microservices
+          name: otlp-grpc
+        - containerPort: 4318 # Nhận HTTP từ microservices
+          name: otlp-http
+        volumeMounts:
+        - name: otel-collector-config-vol
+          mountPath: /etc/otelcol-contrib/
+      volumes:
+      - name: otel-collector-config-vol
+        configMap:
+          name: otel-collector-conf
