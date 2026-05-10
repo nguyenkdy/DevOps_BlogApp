@@ -4,19 +4,24 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import { getWebAutoInstrumentations } from '@opentelemetry/auto-instrumentations-web';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-// 1. THÊM IMPORT RESOURCE NÀY
-import { Resource } from '@opentelemetry/resources'; 
+
+// 1. Dùng hàm chuẩn mới của bản @latest thay vì class Resource
+import { resourceFromAttributes } from '@opentelemetry/resources';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 
 export const initTracing = () => {
   try {
     const exporter = new OTLPTraceExporter({ url: '/v1/traces' });
     const processor = new BatchSpanProcessor(exporter);
 
+    // 2. Khởi tạo tên Service bằng hàm resourceFromAttributes
+    const customResource = resourceFromAttributes({
+      [ATTR_SERVICE_NAME]: 'blogapp-frontend',
+    });
+
+    // 3. NHÚNG TRỰC TIẾP cả resource và processor vào constructor (An toàn tuyệt đối)
     const provider = new WebTracerProvider({
-      // 2. THÊM BLOCK TÊN SERVICE NÀY
-      resource: new Resource({
-        'service.name': 'blogapp-frontend', 
-      }),
+      resource: customResource,
       spanProcessors: [processor],
     });
 
