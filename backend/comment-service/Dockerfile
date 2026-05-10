@@ -1,8 +1,11 @@
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# SỬA LỖI: Thêm dấu / ở cuối để báo cho Docker biết /app/ là một thư mục
+# 1. Tải OpenTelemetry Java Agent trực tiếp vào image
+ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar /app/opentelemetry-javaagent.jar
+
+# 2. Copy file jar của ứng dụng vào
 COPY build/libs/*.jar /app/
 
-# Dùng sh -c để shell tự động tìm và chạy file .jar hiện có trong thư mục
-CMD ["sh", "-c", "java -jar /app/*.jar"]
+# 3. Chạy ứng dụng kèm theo javaagent
+CMD ["sh", "-c", "java -javaagent:/app/opentelemetry-javaagent.jar -jar /app/*.jar"]

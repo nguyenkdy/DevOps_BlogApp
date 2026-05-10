@@ -28,6 +28,22 @@ spec:
               value: "false"
             - name: EUREKA_CLIENT_FETCH_REGISTRY
               value: "false"
+
+            # --- CẤU HÌNH OPENTELEMETRY ---
+            - name: OTEL_SERVICE_NAME
+              value: "eureka-server"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector.monitoring.svc.cluster.local:4318"
+            - name: OTEL_TRACES_EXPORTER
+              value: "otlp"
+            - name: OTEL_METRICS_EXPORTER
+              value: "none"
+            - name: OTEL_LOGS_EXPORTER
+              value: "none"
+            - name: OTEL_TRACES_SAMPLER
+              value: "traceidratio"
+            - name: OTEL_TRACES_SAMPLER_ARG
+              value: "1.0"
           resources:
             requests:
               cpu: "100m"
