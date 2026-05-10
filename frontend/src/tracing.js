@@ -4,14 +4,17 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import { getWebAutoInstrumentations } from '@opentelemetry/auto-instrumentations-web';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { Resource } from '@opentelemetry/resources';
+
+// Dùng API mới của bản @latest thay vì class Resource
+import { resourceFromAttributes } from '@opentelemetry/resources';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 
 export const initTracing = () => {
   try {
-    // 1. Khai báo tên Service trực tiếp bằng string (An toàn nhất)
+    // 1. Khai báo Service Name bằng resourceFromAttributes
     const provider = new WebTracerProvider({
-      resource: new Resource({
-        'service.name': 'blogapp-frontend', 
+      resource: resourceFromAttributes({
+        [ATTR_SERVICE_NAME]: 'blogapp-frontend',
       }),
     });
 
