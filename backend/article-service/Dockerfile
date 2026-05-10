@@ -7,5 +7,5 @@ ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/release
 # 2. Copy file jar của ứng dụng vào
 COPY build/libs/*.jar /app/
 
-# 3. Chạy ứng dụng kèm theo javaagent
+# 3. Chạy ứng dụng kèm theo javaagent----
 CMD ["sh", "-c", "java -javaagent:/app/opentelemetry-javaagent.jar -jar /app/*.jar"]
