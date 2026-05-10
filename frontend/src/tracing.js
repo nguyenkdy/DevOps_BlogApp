@@ -4,24 +4,26 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { Resource } from '@opentelemetry/resources';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
-// Gửi trace đến Nginx Proxy (đã cấu hình /v1/traces)
+// --- ĐÂY LÀ PHẦN CODE MỚI ---
+import { resourceFromAttributes } from '@opentelemetry/resources';
+import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+
 const exporter = new OTLPTraceExporter({
   url: '/v1/traces', 
 });
 
+// Khởi tạo Resource bằng hàm resourceFromAttributes thay vì class new Resource
 const provider = new WebTracerProvider({
-  resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: 'blogapp-frontend',
+  resource: resourceFromAttributes({
+    [ATTR_SERVICE_NAME]: 'blogapp-frontend',
   }),
 });
 
 provider.addSpanProcessor(new BatchSpanProcessor(exporter));
 provider.register({ contextManager: new ZoneContextManager() });
 
-// Khởi chạy tự động bắt các sự kiện (fetch API, load document...)
+// Tự động bắt các sự kiện (fetch API, load document...)
 registerInstrumentations({
   instrumentations: [
     getWebAutoInstrumentations({
