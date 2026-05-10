@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: api-gateway
-          image: khanhduy05/api-gateway:65
+          image: khanhduy05/api-gateway:66
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
