@@ -5,30 +5,24 @@ import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import { getWebAutoInstrumentations } from '@opentelemetry/auto-instrumentations-web';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 
-// Dùng API mới của bản @latest thay vì class Resource
-import { resourceFromAttributes } from '@opentelemetry/resources';
-import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
-
 export const initTracing = () => {
   try {
-    // 1. Khai báo Service Name bằng resourceFromAttributes
-    const provider = new WebTracerProvider({
-      resource: resourceFromAttributes({
-        [ATTR_SERVICE_NAME]: 'blogapp-frontend',
-      }),
-    });
+    // 1. Khởi tạo Exporter và Processor
+    const exporter = new OTLPTraceExporter({ url: '/v1/traces' });
+    const processor = new BatchSpanProcessor(exporter);
 
-    // 2. Gắn processor và exporter
-    provider.addSpanProcessor(
-      new BatchSpanProcessor(new OTLPTraceExporter({ url: '/v1/traces' }))
-    );
+    // 2. NHÚNG TRỰC TIẾP processor vào constructor
+    // (Tuyệt đối không dùng hàm provider.addSpanProcessor để tránh lỗi Vite Minify)
+    const provider = new WebTracerProvider({
+      spanProcessors: [processor],
+    });
 
     // 3. Đăng ký provider
     provider.register({
       contextManager: new ZoneContextManager(),
     });
 
-    // 4. Bắt đầu thu thập dữ liệu tự động
+    // 4. Bắt đầu thu thập dữ liệu
     registerInstrumentations({
       instrumentations: [
         getWebAutoInstrumentations({
