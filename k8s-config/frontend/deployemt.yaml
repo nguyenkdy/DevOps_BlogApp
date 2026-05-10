@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: khanhduy05/frontend:37
+          image: khanhduy05/frontend:43
           imagePullPolicy: Always
 
           ports:
