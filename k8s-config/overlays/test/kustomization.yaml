@@ -1,0 +1,59 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: test
+
+resources:
+  - namespace.yaml
+  - ../../base
+
+commonLabels:
+  app.kubernetes.io/part-of: blogapp
+  environment: test
+
+images:
+  - name: khanhduy05/frontend
+    newTag: test
+  - name: khanhduy05/api-gateway
+    newTag: test
+  - name: khanhduy05/eureka-server
+    newTag: test
+  - name: khanhduy05/auth-service
+    newTag: test
+  - name: khanhduy05/user-service
+    newTag: test
+  - name: khanhduy05/article-service
+    newTag: test
+  - name: khanhduy05/comment-service
+    newTag: test
+
+replicas:
+  - name: frontend
+    count: 1
+  - name: api-gateway
+    count: 1
+  - name: eureka-server
+    count: 1
+  - name: auth-service
+    count: 1
+  - name: user-service
+    count: 1
+  - name: article-service
+    count: 1
+  - name: comment-service
+    count: 1
+  - name: user-db
+    count: 1
+  - name: article-db
+    count: 1
+  - name: comment-db
+    count: 1
+
+patches:
+  - target:
+      kind: Ingress
+      name: blogapp-ingress
+    patch: |-
+      - op: add
+        path: /spec/rules/0/host
+        value: test.blogapp.local
