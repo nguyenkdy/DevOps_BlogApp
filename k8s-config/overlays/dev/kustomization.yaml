@@ -42,11 +42,7 @@ replicas:
     count: 1
   - name: comment-service
     count: 1
-  - name: user-db
-    count: 1
-  - name: article-db
-    count: 1
-  - name: comment-db
+  - name: postgres-db
     count: 1
 
 patches:

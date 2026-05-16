@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: eureka-server
   namespace: production
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
   labels:
     app: eureka-server
 spec:

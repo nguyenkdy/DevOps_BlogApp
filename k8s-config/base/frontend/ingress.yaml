@@ -3,6 +3,8 @@ kind: Ingress
 metadata:
   name: blogapp-ingress
   namespace: production
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
 spec:
   ingressClassName: nginx
   rules:

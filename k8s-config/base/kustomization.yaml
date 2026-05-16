@@ -24,14 +24,7 @@ resources:
   - backend/comment-service/deployment.yaml
   - backend/comment-service/service.yaml
 
-  - backend/user-db/deployment.yaml
-  - backend/user-db/service.yaml
-  - backend/user-db/pvc.yaml
-
-  - backend/article-db/deployment.yaml
-  - backend/article-db/service.yaml
-  - backend/article-db/pvc.yaml
-
-  - backend/comment-db/deployment.yaml
-  - backend/comment-db/service.yaml
-  - backend/comment-db/pvc.yaml
+  - backend/postgres-db/init-configmap.yaml
+  - backend/postgres-db/pvc.yaml
+  - backend/postgres-db/deployment.yaml
+  - backend/postgres-db/service.yaml

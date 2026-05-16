@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: comment-service
   namespace: production
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
   labels:
     app: comment-service
 spec:

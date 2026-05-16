@@ -14,13 +14,7 @@ resources:
   - comment-service/service.yaml
   - api-gateway/deployment.yaml
   - api-gateway/service.yaml
-  - user-db/pvc.yaml
-  - user-db/deployment.yaml
-  - user-db/service.yaml
-  - article-db/pvc.yaml
-  - article-db/deployment.yaml
-  - article-db/service.yaml
-  - comment-db/pvc.yaml
-  - comment-db/deployment.yaml
-  - comment-db/service.yaml
-  - common/secret.yaml
+  - postgres-db/init-configmap.yaml
+  - postgres-db/pvc.yaml
+  - postgres-db/deployment.yaml
+  - postgres-db/service.yaml

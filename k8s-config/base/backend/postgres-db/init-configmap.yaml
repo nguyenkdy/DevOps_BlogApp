@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-db-init
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+data:
+  init.sql: |
+    CREATE DATABASE userdb;
+    CREATE DATABASE articledb;
+    CREATE DATABASE commentdb;

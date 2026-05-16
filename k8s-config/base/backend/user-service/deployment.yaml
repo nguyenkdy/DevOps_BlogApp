@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: user-service
   namespace: production
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
   labels:
     app: user-service
 spec:
@@ -22,7 +24,7 @@ spec:
             - sh
             - -c
             - |
-              until nc -z user-db 5432; do echo waiting for user-db; sleep 2; done
+              until nc -z postgres-db 5432; do echo waiting for postgres-db; sleep 2; done
       containers:
         - name: user-service
           image: khanhduy05/user-service:49
@@ -44,6 +46,12 @@ spec:
               value: "true"
             - name: EUREKA_CLIENT_ENABLED
               value: "true"
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-db:5432/userdb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: postgres
             # --- CẤU HÌNH OPENTELEMETRY ---
             - name: OTEL_SERVICE_NAME
               value: "user-service" # Đổi tên service tương ứng
