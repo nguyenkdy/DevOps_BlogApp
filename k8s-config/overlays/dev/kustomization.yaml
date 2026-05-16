@@ -13,19 +13,19 @@ commonLabels:
 
 images:
   - name: khanhduy05/frontend
-    newTag: dev
+    newTag: 49
   - name: khanhduy05/api-gateway
-    newTag: dev
+    newTag: 66
   - name: khanhduy05/eureka-server
-    newTag: dev
+    newTag: 42
   - name: khanhduy05/auth-service
-    newTag: dev
+    newTag: 51
   - name: khanhduy05/user-service
-    newTag: dev
+    newTag: 49
   - name: khanhduy05/article-service
-    newTag: dev
+    newTag: 48
   - name: khanhduy05/comment-service
-    newTag: dev
+    newTag: 44
 
 replicas:
   - name: frontend
