@@ -45,11 +45,3 @@ replicas:
   - name: postgres-db
     count: 1
 
-patches:
-  - target:
-      kind: Ingress
-      name: blogapp-ingress
-    patch: |-
-      - op: add
-        path: /spec/rules/0/host
-        value: dev.blogapp.local
