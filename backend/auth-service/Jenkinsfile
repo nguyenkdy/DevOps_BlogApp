@@ -9,6 +9,7 @@ pipeline {
         GRADLE_MODULE    = ':backend:auth-service'
         DOCKER_IMAGE     = 'khanhduy05/auth-service'
         DOCKER_TAG       = "${BUILD_NUMBER}"
+        DOCKER_PLATFORMS = 'linux/amd64,linux/arm64'
         SONARQUBE_SERVER = 'SonarQube'
     }
 
@@ -53,28 +54,17 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build and Push Docker Image') {
             steps {
                 echo '========== Build Docker Image =========='
-                
-                dir("${SERVICE_PATH}") {
-                    sh """
-                        docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
-                        
-                        docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:demo1
-                    """
-                }
-            }
-        }
 
-        stage('Push Docker Image') {
-            steps {
-                echo '========== Push Docker Image =========='
                 withDockerRegistry([credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/']) {
-                    sh """
-                        docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
-                        docker push ${DOCKER_IMAGE}:demo1
-                    """
+                    dir("${SERVICE_PATH}") {
+                        sh """
+                            docker buildx create --use --name blogapp-builder || docker buildx use blogapp-builder
+                            docker buildx build --platform ${DOCKER_PLATFORMS} -t ${DOCKER_IMAGE}:${DOCKER_TAG} -t ${DOCKER_IMAGE}:demo1 --push .
+                        """
+                    }
                 }
             }
         }
