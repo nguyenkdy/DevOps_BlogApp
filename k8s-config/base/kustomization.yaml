@@ -2,7 +2,37 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - ../backend
-  - ../frontend/deployemt.yaml
-  - ../frontend/service.yaml
-  - ../frontend/ingress.yaml
+  - frontend/deployment.yaml
+  - frontend/service.yaml
+
+  - backend/api-gateway/deployment.yaml
+  - backend/api-gateway/service.yaml
+
+  - backend/eureka-server/deployment.yaml
+  - backend/eureka-server/service.yaml
+
+  - backend/auth-service/deployment.yaml
+  - backend/auth-service/service.yaml
+
+  - backend/user-service/deployment.yaml
+  - backend/user-service/service.yaml
+
+  - backend/article-service/deployment.yaml
+  - backend/article-service/service.yaml
+
+  - backend/comment-service/deployment.yaml
+  - backend/comment-service/service.yaml
+
+  - backend/user-db/deployment.yaml
+  - backend/user-db/service.yaml
+  - backend/user-db/pvc.yaml
+
+  - backend/article-db/deployment.yaml
+  - backend/article-db/service.yaml
+  - backend/article-db/pvc.yaml
+
+  - backend/comment-db/deployment.yaml
+  - backend/comment-db/service.yaml
+  - backend/comment-db/pvc.yaml
+
+  - backend/ingress.yaml
