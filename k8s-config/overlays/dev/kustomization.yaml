@@ -25,7 +25,7 @@ images:
   - name: khanhduy05/article-service
     newTag: "48"
   - name: khanhduy05/comment-service
-    newTag: "44"
+    newTag: "45"
 
 replicas:
   - name: frontend
