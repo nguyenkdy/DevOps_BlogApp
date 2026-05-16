@@ -34,5 +34,3 @@ resources:
   - backend/comment-db/deployment.yaml
   - backend/comment-db/service.yaml
   - backend/comment-db/pvc.yaml
-
-  - backend/ingress.yaml
