@@ -15,17 +15,17 @@ images:
   - name: khanhduy05/frontend
     newTag: "49"
   - name: khanhduy05/api-gateway
-    newTag: "66"
+    newTag: "68"
   - name: khanhduy05/eureka-server
-    newTag: "42"
-  - name: khanhduy05/auth-service
-    newTag: "51"    
-  - name: khanhduy05/user-service
-    newTag: "49"
-  - name: khanhduy05/article-service
-    newTag: "48"
-  - name: khanhduy05/comment-service
     newTag: "45"
+  - name: khanhduy05/auth-service
+    newTag: "53"    
+  - name: khanhduy05/user-service
+    newTag: "52"
+  - name: khanhduy05/article-service
+    newTag: "51"
+  - name: khanhduy05/comment-service
+    newTag: "47"
 
 replicas:
   - name: frontend
