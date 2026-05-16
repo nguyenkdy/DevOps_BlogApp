@@ -23,3 +23,4 @@ resources:
   - comment-db/pvc.yaml
   - comment-db/deployment.yaml
   - comment-db/service.yaml
+  - common/secret.yaml
