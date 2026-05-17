@@ -7,7 +7,7 @@ metadata:
     app: grafana
 spec:
   type: LoadBalancer
-  loadBalancerIP: 52.139.236.175
+  loadBalancerIP: 20.197.73.0
   selector:
     app: grafana
   ports:
