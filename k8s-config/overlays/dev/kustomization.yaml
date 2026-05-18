@@ -45,24 +45,5 @@ replicas:
   - name: postgres-db
     count: 1
 
-patches:
-  - target:
-      kind: Service
-      name: frontend
-    patch: |-
-      - op: replace
-        path: /spec/type
-        value: LoadBalancer
-      - op: add
-        path: /spec/loadBalancerIP
-        value: 20.197.73.0
-      - op: replace
-        path: /spec/ports/0/port
-        value: 10001
-  - target:
-      kind: Ingress
-      name: blogapp-ingress
-    patch: |-
-      - op: remove
-        path: /spec/rules/0/http/paths/1
+
 
