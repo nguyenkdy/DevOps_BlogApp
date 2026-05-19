@@ -62,8 +62,11 @@ patches:
       kind: Ingress
       name: blogapp-ingress
     patch: |-
-      - op: remove
-        path: /spec/rules/0/http/paths/1
+      $patch: delete
+      apiVersion: networking.k8s.io/v1
+      kind: Ingress
+      metadata:
+        name: blogapp-ingress
 
 
 
