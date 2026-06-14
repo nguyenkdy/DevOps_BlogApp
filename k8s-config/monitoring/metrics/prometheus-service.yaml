@@ -6,7 +6,8 @@ metadata:
   labels:
     app: prometheus
 spec:
-  type: ClusterIP
+  type: LoadBalancer
+  LoadBalancerIP: 20.197.73.0
   selector:
     app: prometheus
   ports:
