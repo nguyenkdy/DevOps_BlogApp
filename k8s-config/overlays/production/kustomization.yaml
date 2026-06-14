@@ -13,7 +13,7 @@ commonLabels:
 
 images:
   - name: khanhduy05/frontend
-    newTag: "49"
+    newTag: "50"
   - name: khanhduy05/api-gateway
     newTag: "66"
   - name: khanhduy05/eureka-server
