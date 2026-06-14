@@ -8,7 +8,7 @@ public class UpdateUserRequest {
   public String getName() {
     return name;
   }
-
+// test pipeline
   public void setName(String name) {
     this.name = name;
   }
