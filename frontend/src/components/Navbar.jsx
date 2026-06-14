@@ -18,7 +18,7 @@ export default function Navbar() {
           Welcome, {user?.name}
         </span>
 
-        <Link to="/">Home</Link>
+        <Link to="/">Home1</Link>
         <Link to="/article/new">New Article</Link>
         <Link to="/account">My Account</Link>
       </div>
