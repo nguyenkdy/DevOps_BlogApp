@@ -41,7 +41,7 @@ flowchart TB
 
     User -->|"/ "| Ingress --> Frontend
     User -->|"/api/**"| Ingress --> Gateway
-    Frontend -->|"axios /api/**"| Gateway
+    Frontend -->|"/api/**"| Gateway
 
     Gateway -->|"/api/auth/**"| Auth
     Gateway -->|"/api/users/**"| Users
