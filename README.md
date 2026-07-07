@@ -48,11 +48,11 @@ flowchart TB
     Gateway -->|"/api/articles/**"| Articles
     Gateway -->|"/api/comments/**"| Comments
 
-    Auth -.Feign.-> Users
-    Articles -.Feign.-> Users
-    Articles -.Feign.-> Comments
-    Comments -.Feign.-> Articles
-    Comments -.Feign.-> Users
+    Auth -.-> Users
+    Articles -.-> Users
+    Articles -.-> Comments
+    Comments -.-> Articles
+    Comments -.-> Users
 
     Auth --- Eureka
     Users --- Eureka
@@ -159,7 +159,7 @@ flowchart LR
     C --> D["SonarQube analysis<br/>+ Quality Gate"]
     D --> E["docker buildx build<br/>linux/amd64,arm64"]
     E --> F["Push to Docker Hub<br/>khanhduy05/&lt;service&gt;:BUILD_NUMBER"]
-    F --> G["Bump image tag in<br/>k8s-config overlay"]
+    F --> G["Update image tag in<br/>k8s-config overlay"]
     G --> H["ArgoCD sync"]
     H --> I["Deployed to cluster"]
 ```
